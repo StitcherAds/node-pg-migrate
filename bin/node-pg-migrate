@@ -41,6 +41,7 @@ const lockArg = "lock";
 const timestampArg = "timestamp";
 const dryRunArg = "dry-run";
 const fakeArg = "fake";
+const isRedshiftArg = "redshift";
 
 const { argv } = yargs
   .usage("Usage: $0 [up|down|create|redo] [migrationName] [options]")
@@ -163,6 +164,13 @@ const { argv } = yargs
   .option(timestampArg, {
     default: false,
     describe: "Treats number argument to up/down migration as timestamp",
+    type: "boolean"
+  })
+
+  .option(isRedshiftArg, {
+    default: false,
+    describe:
+      "When true, disables locking mechanism and adapts migration runner for Redshift compatability",
     type: "boolean"
   })
 
@@ -298,6 +306,11 @@ if (action === "create") {
     console.log("no lock");
   }
 
+  const isRedshift = argv[isRedshiftArg];
+  if (isRedshift) {
+    console.log("redshift mode");
+  }
+
   const updownArg = argv._.length ? argv._[0] : null;
   let numMigrations;
   let migrationName;
@@ -331,6 +344,7 @@ if (action === "create") {
       direction,
       singleTransaction,
       noLock,
+      isRedshift,
       fake
     };
   };
